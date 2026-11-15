@@ -1,5 +1,7 @@
 package com.notifydouble.receiver.ancs
 
+import com.notifydouble.receiver.i18n.Lang.t
+
 interface AncsRequester {
     fun enqueue(request: AncsRequest)
     fun cancelNotification(uid: Long)
