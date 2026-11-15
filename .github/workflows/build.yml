@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # The repository has no Gradle wrapper jar, so the action installs Gradle itself.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Unit tests and debug APK
+        run: gradle testDebugUnitTest assembleDebug
+
+      - name: Mi Fitness probe
+        run: gradle -p tools/mifitness-probe assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notify-double-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
