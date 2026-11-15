@@ -164,7 +164,7 @@ class MainActivity : ComponentActivity(), ReceiverActions {
 
     private companion object {
         const val MI_FITNESS_PACKAGE = "com.xiaomi.wearable"
-        const val GUIDE_URL = "https://github.com/rolyMq/notify-double#настройка"
+        const val GUIDE_URL = "https://github.com/Expl0iD-Dev-Team/notify-double#настройка"
         const val COPY_LINES = 2_000
     }
 }
