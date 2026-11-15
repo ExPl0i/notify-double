@@ -1,6 +1,7 @@
 package com.notifydouble.receiver.ble
 
 import android.annotation.SuppressLint
+import com.notifydouble.receiver.i18n.Lang.t
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
@@ -40,14 +41,16 @@ class AncsLink(
         fun onEvent(event: NotificationEvent)
     }
 
-    enum class State(val label: String) {
-        STOPPED("остановлен"),
-        BLUETOOTH_OFF("Bluetooth выключен"),
-        CONNECTING("подключение"),
-        WAITING("ожидание iPhone"),
-        PAIRING("сопряжение"),
-        SUBSCRIBING("подписка"),
-        SESSION("сессия ANCS"),
+    enum class State(private val en: String, private val ru: String) {
+        STOPPED("stopped", "остановлен"),
+        BLUETOOTH_OFF("Bluetooth is off", "Bluetooth выключен"),
+        CONNECTING("connecting", "подключение"),
+        WAITING("waiting for the iPhone", "ожидание iPhone"),
+        PAIRING("pairing", "сопряжение"),
+        SUBSCRIBING("subscribing", "подписка"),
+        SESSION("ANCS session", "сессия ANCS");
+
+        val label: String get() = t(en, ru)
     }
 
     private val adapter: BluetoothAdapter? =
@@ -108,7 +111,7 @@ class AncsLink(
     /** Renews a background connection request that may have stalled. */
     fun onWatchdog() {
         if (!running || state != State.WAITING) return
-        EventLog.add("iPhone не найден за 10 мин, заявка на подключение обновлена")
+        EventLog.add(t("iPhone not found for 10 min, connection request renewed", "iPhone не найден за 10 мин, заявка на подключение обновлена"))
         failures = 0
         connect(autoConnect = true)
     }
@@ -117,10 +120,10 @@ class AncsLink(
         if (state != State.PAIRING) return
         when (bondState) {
             BluetoothDevice.BOND_BONDED -> {
-                EventLog.add("Сопряжение завершено, повторный поиск служб")
-                queue.enqueue(GattQueue.Kind.DISCOVER, "поиск служб") { it.discoverServices() }
+                EventLog.add(t("Pairing complete, discovering services again", "Сопряжение завершено, повторный поиск служб"))
+                queue.enqueue(GattQueue.Kind.DISCOVER, t("service discovery", "поиск служб")) { it.discoverServices() }
             }
-            BluetoothDevice.BOND_NONE -> EventLog.add("Сопряжение не выполнено или отменено")
+            BluetoothDevice.BOND_NONE -> EventLog.add(t("Pairing failed or was cancelled", "Сопряжение не выполнено или отменено"))
         }
     }
 
@@ -132,7 +135,13 @@ class AncsLink(
             return
         }
         closeGatt()
-        EventLog.add(if (autoConnect) "Ожидание iPhone в зоне действия" else "Подключение к $target")
+        EventLog.add(
+            if (autoConnect) {
+                t("Waiting for the iPhone to come in range", "Ожидание iPhone в зоне действия")
+            } else {
+                t("Connecting to $target", "Подключение к $target")
+            },
+        )
         setState(if (autoConnect) State.WAITING else State.CONNECTING)
         val newGatt = bluetooth.getRemoteDevice(target).connectGatt(
             context,
@@ -143,7 +152,7 @@ class AncsLink(
             handler,
         )
         if (newGatt == null) {
-            EventLog.add("Android не создал GATT-клиент")
+            EventLog.add(t("Android did not create a GATT client", "Android не создал GATT-клиент"))
             scheduleReconnect()
             return
         }
@@ -177,14 +186,14 @@ class AncsLink(
 
     private fun onConnected() {
         failures = 0
-        EventLog.add("Подключено")
+        EventLog.add(t("Connected", "Подключено"))
         setState(State.SUBSCRIBING)
-        queue.enqueue(GattQueue.Kind.MTU, "запрос MTU") { it.requestMtu(MTU) }
-        queue.enqueue(GattQueue.Kind.DISCOVER, "поиск служб") { it.discoverServices() }
+        queue.enqueue(GattQueue.Kind.MTU, t("MTU request", "запрос MTU")) { it.requestMtu(MTU) }
+        queue.enqueue(GattQueue.Kind.DISCOVER, t("service discovery", "поиск служб")) { it.discoverServices() }
     }
 
     private fun onDisconnected(status: Int) {
-        EventLog.add("Отключено: ${disconnectReason(status)}")
+        EventLog.add(t("Disconnected: ${disconnectReason(status)}", "Отключено: ${disconnectReason(status)}"))
         closeGatt()
         when {
             !running -> setState(State.STOPPED)
@@ -198,18 +207,23 @@ class AncsLink(
 
     private fun handleServices(target: BluetoothGatt, status: Int) {
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            EventLog.add("Поиск служб не удался: ${gattStatus(status)}")
+            EventLog.add(t("Service discovery failed: ${gattStatus(status)}", "Поиск служб не удался: ${gattStatus(status)}"))
             target.disconnect()
             return
         }
         if (target.device.bondState != BluetoothDevice.BOND_BONDED) {
-            EventLog.add("Нет сопряжения с iPhone, запрашиваю сопряжение")
+            EventLog.add(t("Not paired with the iPhone, requesting pairing", "Нет сопряжения с iPhone, запрашиваю сопряжение"))
             setState(State.PAIRING)
-            if (!target.device.createBond()) EventLog.add("Android не начал сопряжение")
+            if (!target.device.createBond()) EventLog.add(t("Android did not start pairing", "Android не начал сопряжение"))
             return
         }
         if (target.getService(AncsUuids.SERVICE) == null) {
-            EventLog.add("Служба ANCS не найдена: проверьте переключатель системных уведомлений на iPhone")
+            EventLog.add(
+                t(
+                    "ANCS service not found: check the system notifications switch on the iPhone",
+                    "Служба ANCS не найдена: проверьте переключатель системных уведомлений на iPhone",
+                ),
+            )
             return
         }
         // A new subscription starts a new ANCS session with new notification numbers.
@@ -222,11 +236,11 @@ class AncsLink(
 
     private fun subscribe(characteristicUuid: UUID) {
         val label = characteristicName(characteristicUuid)
-        queue.enqueue(GattQueue.Kind.DESCRIPTOR, "подписка на $label") { target ->
+        queue.enqueue(GattQueue.Kind.DESCRIPTOR, t("subscription to $label", "подписка на $label")) { target ->
             val characteristic = target.getService(AncsUuids.SERVICE)?.getCharacteristic(characteristicUuid)
             val descriptor = characteristic?.getDescriptor(GattUuids.CCCD)
             if (characteristic == null || descriptor == null) {
-                EventLog.add("Нет характеристики или дескриптора: $label")
+                EventLog.add(t("Missing characteristic or descriptor: $label", "Нет характеристики или дескриптора: $label"))
                 false
             } else if (!target.setCharacteristicNotification(characteristic, true)) {
                 false
@@ -249,10 +263,10 @@ class AncsLink(
         val characteristicUuid = descriptor.characteristic.uuid
         val label = characteristicName(characteristicUuid)
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            EventLog.add("Ошибка подписки на $label: ${gattStatus(status)}")
+            EventLog.add(t("Subscription to $label failed: ${gattStatus(status)}", "Ошибка подписки на $label: ${gattStatus(status)}"))
             return
         }
-        EventLog.add("Подписка оформлена: $label")
+        EventLog.add(t("Subscribed: $label", "Подписка оформлена: $label"))
         if (characteristicUuid == AncsUuids.NOTIFICATION_SOURCE) setState(State.SESSION)
     }
 
@@ -261,9 +275,9 @@ class AncsLink(
             AncsUuids.NOTIFICATION_SOURCE -> {
                 val event = NotificationEvent.parse(value)
                 if (event == null) {
-                    EventLog.add("Notification Source: пакет длиной ${value.size} байт пропущен")
+                    EventLog.add(t("Notification Source: skipped a ${value.size}-byte packet", "Notification Source: пакет длиной ${value.size} байт пропущен"))
                 } else {
-                    EventLog.add("Событие: ${event.describe()}")
+                    EventLog.add(t("Event: ${event.describe()}", "Событие: ${event.describe()}"))
                     listener.onEvent(event)
                     forwarder.onEvent(event)
                 }
@@ -273,10 +287,10 @@ class AncsLink(
     }
 
     private fun writeControlPoint(value: ByteArray) {
-        queue.enqueue(GattQueue.Kind.WRITE, "запрос к Control Point") { target ->
+        queue.enqueue(GattQueue.Kind.WRITE, t("Control Point request", "запрос к Control Point")) { target ->
             val characteristic = target.getService(AncsUuids.SERVICE)?.getCharacteristic(AncsUuids.CONTROL_POINT)
             if (characteristic == null) {
-                EventLog.add("Нет характеристики Control Point")
+                EventLog.add(t("Missing Control Point characteristic", "Нет характеристики Control Point"))
                 false
             } else {
                 writeCharacteristic(target, characteristic, value)
@@ -325,8 +339,8 @@ class AncsLink(
         }
 
         override fun onServiceChanged(target: BluetoothGatt) {
-            EventLog.add("iPhone сообщил об изменении служб, повторный поиск")
-            queue.enqueue(GattQueue.Kind.DISCOVER, "поиск служб") { it.discoverServices() }
+            EventLog.add(t("iPhone reported changed services, discovering again", "iPhone сообщил об изменении служб, повторный поиск"))
+            queue.enqueue(GattQueue.Kind.DISCOVER, t("service discovery", "поиск служб")) { it.discoverServices() }
         }
 
         override fun onCharacteristicWrite(
@@ -371,22 +385,22 @@ class AncsLink(
         }
 
         fun disconnectReason(status: Int): String = when (status) {
-            0 -> "0, штатно"
-            8 -> "8, потеря связи"
-            19 -> "19, соединение закрыл iPhone"
-            22 -> "22, соединение закрыл Android"
-            34 -> "34, iPhone не ответил вовремя"
-            62 -> "62, соединение не установилось"
-            133 -> "133, общая ошибка GATT"
-            147 -> "147, тайм-аут подключения"
+            0 -> t("0, normal", "0, штатно")
+            8 -> t("8, link lost", "8, потеря связи")
+            19 -> t("19, closed by the iPhone", "19, соединение закрыл iPhone")
+            22 -> t("22, closed by Android", "22, соединение закрыл Android")
+            34 -> t("34, iPhone did not respond in time", "34, iPhone не ответил вовремя")
+            62 -> t("62, connection not established", "62, соединение не установилось")
+            133 -> t("133, generic GATT error", "133, общая ошибка GATT")
+            147 -> t("147, connection timeout", "147, тайм-аут подключения")
             else -> status.toString()
         }
 
         fun gattStatus(status: Int): String = when (status) {
-            5 -> "5, нужна аутентификация (сопряжение)"
-            15 -> "15, нужно шифрование"
-            133 -> "133, общая ошибка GATT"
-            137 -> "137, ошибка аутентификации"
+            5 -> t("5, authentication (pairing) required", "5, нужна аутентификация (сопряжение)")
+            15 -> t("15, encryption required", "15, нужно шифрование")
+            133 -> t("133, generic GATT error", "133, общая ошибка GATT")
+            137 -> t("137, authentication failed", "137, ошибка аутентификации")
             else -> status.toString()
         }
     }

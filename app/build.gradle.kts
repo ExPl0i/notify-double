@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// Release signing comes from the environment (the release workflow restores it from secrets).
+// Without it, assembleRelease produces an unsigned APK.
+val releaseKeystore: String? = System.getenv("SIGNING_STORE_FILE")
+
 android {
     namespace = "com.notifydouble.receiver"
     compileSdk = 35
@@ -12,8 +16,28 @@ android {
         applicationId = "io.github.rolymq.notifydouble"
         minSdk = 31
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
+    }
+
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storeType = "pkcs12"
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                // PKCS12 stores use one password for the store and the key.
+                keyPassword = System.getenv("SIGNING_STORE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            if (releaseKeystore != null) signingConfig = signingConfigs.getByName("release")
+        }
     }
 
     compileOptions {

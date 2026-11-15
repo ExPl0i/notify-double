@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">iPhone Receiver</string>
+
+    <!-- Notifications -->
+    <string name="channel_service">Receiver service</string>
+    <string name="channel_iphone">iPhone notifications</string>
+    <string name="service_title">iPhone Receiver: %1$s</string>
+    <string name="public_title">iPhone</string>
+    <string name="public_text">New notification</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_log">Log</string>
+
+    <!-- Home -->
+    <string name="home_route">iPhone → Mi Fitness → band</string>
+    <string name="status_title">Status</string>
+    <string name="no_iphone">No iPhone selected</string>
+    <string name="headline_stopped">Stopped</string>
+    <string name="headline_bluetooth_off">Bluetooth is off</string>
+    <string name="headline_connecting">Connecting…</string>
+    <string name="headline_waiting">Waiting for iPhone</string>
+    <string name="headline_pairing">Pairing</string>
+    <string name="headline_connected">Connected</string>
+    <string name="stat_events">Events</string>
+    <string name="stat_forwarded">Forwarded</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_iphone">iPhone</string>
+    <string name="action_battery">Battery</string>
+    <string name="action_mi_fitness">Mi Fitness</string>
+    <string name="last_event">Last event</string>
+    <string name="no_events">No events yet</string>
+    <string name="group_setup">Setup</string>
+    <string name="setting_iphone">iPhone</string>
+    <string name="setting_iphone_hint">Choose from paired devices</string>
+    <string name="setting_iphone_none">not selected</string>
+    <string name="setting_battery">Battery optimization</string>
+    <string name="setting_battery_hint">Turn it off so the service keeps running</string>
+    <string name="battery_off">off</string>
+    <string name="battery_on">on</string>
+    <string name="setting_mi_fitness">Mi Fitness</string>
+    <string name="setting_mi_fitness_hint">Turn on “iPhone Receiver” in app notifications</string>
+    <string name="setting_guide">How to pair the phones</string>
+    <string name="setting_guide_hint">Step-by-step guide on GitHub</string>
+
+    <!-- Device chooser -->
+    <string name="chooser_title">Choose your iPhone</string>
+    <string name="chooser_hint">Paired devices are listed. Your iPhone is the one paired with nRF Connect.</string>
+    <string name="unnamed">Unnamed</string>
+    <string name="cancel">Cancel</string>
+    <string name="type_le">LE</string>
+    <string name="type_classic">classic</string>
+    <string name="type_dual">dual-mode</string>
+    <string name="type_unknown">unknown type</string>
+
+    <!-- Apps -->
+    <string name="apps_title">Apps</string>
+    <string name="apps_warning">Text is requested only from the apps you turn on. Leave banks, authenticators and Messages off: they carry verification codes.</string>
+    <string name="apps_empty_title">Nothing yet</string>
+    <string name="apps_empty_hint">iPhone apps appear here after their first notifications.</string>
+    <string name="apps_group">From iPhone · %1$d</string>
+
+    <!-- Log -->
+    <string name="log_title">Log</string>
+    <string name="log_hint">Newest first. Notification text is never logged.</string>
+    <string name="log_empty">The log is empty</string>
+    <string name="log_copy">Copy log</string>
+    <string name="log_clear">Clear log</string>
+    <string name="log_clip_label">Receiver log</string>
+    <string name="log_copied">Log copied</string>
+
+    <!-- Messages -->
+    <string name="need_permission">The nearby devices permission is required</string>
+    <string name="turn_on_bluetooth">Turn on Bluetooth</string>
+    <string name="no_bonded">No paired devices: pair the iPhone with nRF Connect first</string>
+    <string name="choose_iphone_first">Choose your iPhone first</string>
+    <string name="battery_already_off">Battery optimization is already off</string>
+    <string name="mi_fitness_missing">Mi Fitness is not installed</string>
+    <string name="no_browser">No browser to open %1$s</string>
+</resources>

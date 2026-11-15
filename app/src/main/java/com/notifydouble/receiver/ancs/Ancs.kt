@@ -1,5 +1,6 @@
 package com.notifydouble.receiver.ancs
 
+import com.notifydouble.receiver.i18n.Lang.t
 import java.util.UUID
 
 object AncsUuids {
@@ -13,10 +14,12 @@ object GattUuids {
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 }
 
-enum class EventType(val code: Int, val label: String) {
-    ADDED(0, "добавлено"),
-    MODIFIED(1, "изменено"),
-    REMOVED(2, "удалено");
+enum class EventType(val code: Int, private val en: String, private val ru: String) {
+    ADDED(0, "added", "добавлено"),
+    MODIFIED(1, "modified", "изменено"),
+    REMOVED(2, "removed", "удалено");
+
+    val label: String get() = t(en, ru)
 
     companion object {
         fun of(code: Int): EventType? = entries.firstOrNull { it.code == code }
@@ -43,17 +46,17 @@ data class NotificationEvent(
 
     fun describe(): String {
         val flagLabels = buildList {
-            if (silent) add("без звука")
-            if (important) add("важное")
-            if (preExisting) add("существовало до подключения")
-            if (positiveAction) add("есть положительное действие")
-            if (negativeAction) add("есть отрицательное действие")
+            if (silent) add(t("silent", "без звука"))
+            if (important) add(t("important", "важное"))
+            if (preExisting) add(t("existed before connection", "существовало до подключения"))
+            if (positiveAction) add(t("has positive action", "есть положительное действие"))
+            if (negativeAction) add(t("has negative action", "есть отрицательное действие"))
         }
         return buildString {
-            append(type?.label ?: "тип $typeCode")
+            append(type?.label ?: t("type $typeCode", "тип $typeCode"))
             append(" · ").append(categoryLabel(category))
             append(" · №").append(uid)
-            append(" · в категории ").append(categoryCount)
+            append(" · ").append(t("in category", "в категории")).append(' ').append(categoryCount)
             if (flagLabels.isNotEmpty()) append(" · ").append(flagLabels.joinToString(", "))
         }
     }
@@ -66,22 +69,23 @@ data class NotificationEvent(
         const val FLAG_NEGATIVE_ACTION = 0x10
 
         private val CATEGORY_LABELS = listOf(
-            "прочее",
-            "входящий вызов",
-            "пропущенный вызов",
-            "голосовая почта",
-            "соцсети и сообщения",
-            "расписание",
-            "почта",
-            "новости",
-            "здоровье и фитнес",
-            "бизнес и финансы",
-            "местоположение",
-            "развлечения",
+            "other" to "прочее",
+            "incoming call" to "входящий вызов",
+            "missed call" to "пропущенный вызов",
+            "voicemail" to "голосовая почта",
+            "social and messages" to "соцсети и сообщения",
+            "schedule" to "расписание",
+            "email" to "почта",
+            "news" to "новости",
+            "health and fitness" to "здоровье и фитнес",
+            "business and finance" to "бизнес и финансы",
+            "location" to "местоположение",
+            "entertainment" to "развлечения",
         )
 
         fun categoryLabel(category: Int): String =
-            CATEGORY_LABELS.getOrNull(category) ?: "категория $category"
+            CATEGORY_LABELS.getOrNull(category)?.let { (en, ru) -> t(en, ru) }
+                ?: t("category $category", "категория $category")
 
         /** Returns null for packets shorter than 8 bytes. Numbers are little endian. */
         fun parse(bytes: ByteArray): NotificationEvent? {

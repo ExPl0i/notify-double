@@ -22,7 +22,7 @@
         android:name=".ReceiverApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="Приёмник iPhone"
+        android:label="@string/app_name"
         android:theme="@style/Theme.Receiver">
 
         <activity

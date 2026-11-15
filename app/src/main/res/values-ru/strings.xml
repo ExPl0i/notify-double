@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Приёмник iPhone</string>
+
+    <!-- Notifications -->
+    <string name="channel_service">Служба приёмника</string>
+    <string name="channel_iphone">Уведомления iPhone</string>
+    <string name="service_title">Приёмник iPhone: %1$s</string>
+    <string name="public_title">iPhone</string>
+    <string name="public_text">Новое уведомление</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Главная</string>
+    <string name="tab_apps">Приложения</string>
+    <string name="tab_log">Журнал</string>
+
+    <!-- Home -->
+    <string name="home_route">iPhone → Mi Fitness → браслет</string>
+    <string name="status_title">Состояние</string>
+    <string name="no_iphone">iPhone не выбран</string>
+    <string name="headline_stopped">Остановлен</string>
+    <string name="headline_bluetooth_off">Bluetooth выключен</string>
+    <string name="headline_connecting">Подключение…</string>
+    <string name="headline_waiting">Ожидание iPhone</string>
+    <string name="headline_pairing">Сопряжение</string>
+    <string name="headline_connected">Подключено</string>
+    <string name="stat_events">Событий</string>
+    <string name="stat_forwarded">Переслано</string>
+    <string name="action_start">Запуск</string>
+    <string name="action_stop">Стоп</string>
+    <string name="action_iphone">iPhone</string>
+    <string name="action_battery">Батарея</string>
+    <string name="action_mi_fitness">Mi Fitness</string>
+    <string name="last_event">Последнее событие</string>
+    <string name="no_events">Пока событий нет</string>
+    <string name="group_setup">Настройка</string>
+    <string name="setting_iphone">iPhone</string>
+    <string name="setting_iphone_hint">Выберите из сопряжённых устройств</string>
+    <string name="setting_iphone_none">не выбран</string>
+    <string name="setting_battery">Оптимизация батареи</string>
+    <string name="setting_battery_hint">Нужно отключить, чтобы служба не останавливалась</string>
+    <string name="battery_off">отключена</string>
+    <string name="battery_on">включена</string>
+    <string name="setting_mi_fitness">Mi Fitness</string>
+    <string name="setting_mi_fitness_hint">Включите «Приёмник iPhone» в уведомлениях приложений</string>
+    <string name="setting_guide">Как связать телефоны</string>
+    <string name="setting_guide_hint">Пошаговая инструкция на GitHub</string>
+
+    <!-- Device chooser -->
+    <string name="chooser_title">Выберите iPhone</string>
+    <string name="chooser_hint">Показаны сопряжённые устройства. iPhone – это запись, сопряжённая через nRF Connect.</string>
+    <string name="unnamed">Без имени</string>
+    <string name="cancel">Отмена</string>
+    <string name="type_le">LE</string>
+    <string name="type_classic">классический</string>
+    <string name="type_dual">двухрежимный</string>
+    <string name="type_unknown">тип неизвестен</string>
+
+    <!-- Apps -->
+    <string name="apps_title">Приложения</string>
+    <string name="apps_warning">Текст запрашивается только у отмеченных приложений. Не отмечайте банки, аутентификаторы и «Сообщения»: через них приходят коды.</string>
+    <string name="apps_empty_title">Пока пусто</string>
+    <string name="apps_empty_hint">Приложения iPhone появятся здесь после первых уведомлений.</string>
+    <string name="apps_group">С iPhone · %1$d</string>
+
+    <!-- Log -->
+    <string name="log_title">Журнал</string>
+    <string name="log_hint">Новые записи сверху. Текст уведомлений в журнал не попадает.</string>
+    <string name="log_empty">Журнал пуст</string>
+    <string name="log_copy">Копировать журнал</string>
+    <string name="log_clear">Очистить журнал</string>
+    <string name="log_clip_label">Журнал приёмника</string>
+    <string name="log_copied">Журнал скопирован</string>
+
+    <!-- Messages -->
+    <string name="need_permission">Нужно разрешение на устройства поблизости</string>
+    <string name="turn_on_bluetooth">Включите Bluetooth</string>
+    <string name="no_bonded">Нет сопряжённых устройств: сначала выполните сопряжение через nRF Connect</string>
+    <string name="choose_iphone_first">Сначала выберите iPhone</string>
+    <string name="battery_already_off">Оптимизация уже отключена</string>
+    <string name="mi_fitness_missing">Mi Fitness не установлен</string>
+    <string name="no_browser">Нет браузера, чтобы открыть %1$s</string>
+</resources>

@@ -23,8 +23,8 @@ class AndroidPoster(private val context: Context) : Poster {
     override fun show(id: Int, title: String, text: String) {
         val publicVersion = Notification.Builder(context, ReceiverApp.IPHONE_CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("iPhone")
-            .setContentText("Новое уведомление")
+            .setContentTitle(context.getString(R.string.public_title))
+            .setContentText(context.getString(R.string.public_text))
             .build()
         val notification = Notification.Builder(context, ReceiverApp.IPHONE_CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)

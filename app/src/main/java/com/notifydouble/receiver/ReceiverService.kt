@@ -1,6 +1,7 @@
 package com.notifydouble.receiver
 
 import android.app.AlarmManager
+import com.notifydouble.receiver.i18n.Lang.t
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -67,12 +68,12 @@ class ReceiverService : Service() {
                 BluetoothAdapter.ACTION_STATE_CHANGED ->
                     when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                         BluetoothAdapter.STATE_TURNING_OFF -> {
-                            EventLog.add("Bluetooth выключается")
+                            EventLog.add(t("Bluetooth is turning off", "Bluetooth выключается"))
                             handler.post { link.onBluetoothOff() }
                         }
                         BluetoothAdapter.STATE_OFF -> handler.post { link.onBluetoothOff() }
                         BluetoothAdapter.STATE_ON -> {
-                            EventLog.add("Bluetooth включён")
+                            EventLog.add(t("Bluetooth is on", "Bluetooth включён"))
                             handler.post { link.onBluetoothOn() }
                         }
                     }
@@ -112,7 +113,12 @@ class ReceiverService : Service() {
         // Callers check these before starting, so this branch should not normally run.
         val address = AppSettings.address(this)
         if (address == null || !Permissions.bluetoothGranted(this)) {
-            EventLog.add("Служба не запущена: не выбран iPhone или нет разрешения Bluetooth")
+            EventLog.add(
+                t(
+                    "Service not started: no iPhone selected or no Bluetooth permission",
+                    "Служба не запущена: не выбран iPhone или нет разрешения Bluetooth",
+                ),
+            )
             stopSelf()
             return START_NOT_STICKY
         }
@@ -120,7 +126,7 @@ class ReceiverService : Service() {
         if (!started) {
             started = true
             ReceiverState.update { ReceiverStatus(link = it.link) }
-            EventLog.add("Служба запущена")
+            EventLog.add(t("Service started", "Служба запущена"))
             handler.post { link.start(address) }
         }
         return START_STICKY
@@ -134,7 +140,7 @@ class ReceiverService : Service() {
         thread.quitSafely()
         stopForeground(STOP_FOREGROUND_REMOVE)
         ReceiverState.update { it.copy(link = AncsLink.State.STOPPED) }
-        EventLog.add("Служба остановлена")
+        EventLog.add(t("Service stopped", "Служба остановлена"))
         super.onDestroy()
     }
 
@@ -163,7 +169,7 @@ class ReceiverService : Service() {
         )
         return Notification.Builder(this, ReceiverApp.SERVICE_CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Приёмник iPhone: ${linkState.label}")
+            .setContentTitle(getString(R.string.service_title, linkState.label))
             .setContentIntent(openApp)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -182,7 +188,7 @@ class BootReceiver : BroadcastReceiver() {
         if (action != Intent.ACTION_BOOT_COMPLETED && action != Intent.ACTION_MY_PACKAGE_REPLACED) return
         if (!AppSettings.enabled(context) || AppSettings.address(context) == null) return
         if (!Permissions.bluetoothGranted(context)) return
-        EventLog.add("Автозапуск: $action")
+        EventLog.add(t("Autostart: $action", "Автозапуск: $action"))
         context.startForegroundService(Intent(context, ReceiverService::class.java))
     }
 }

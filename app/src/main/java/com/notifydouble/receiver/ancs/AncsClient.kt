@@ -49,14 +49,14 @@ class AncsClient(
     fun onData(bytes: ByteArray) {
         val request = active
         if (request == null) {
-            log("Data Source: ${bytes.size} байт без запроса")
+            log(t("Data Source: ${bytes.size} bytes without a request", "Data Source: ${bytes.size} байт без запроса"))
             return
         }
         buffer += bytes
         when (val result = AncsResponse.parse(buffer, request)) {
             ParseResult.Incomplete -> return
             ParseResult.Invalid -> {
-                log("Ответ iPhone не совпал с запросом")
+                log(t("iPhone response did not match the request", "Ответ iPhone не совпал с запросом"))
                 finishActive()
             }
             is ParseResult.Complete -> {
@@ -76,7 +76,7 @@ class AncsClient(
 
     fun onTimeout() {
         if (active == null) return
-        log("iPhone не ответил на запрос")
+        log(t("iPhone did not answer the request", "iPhone не ответил на запрос"))
         finishActive()
         next()
     }
@@ -104,11 +104,11 @@ class AncsClient(
 
     companion object {
         fun errorText(status: Int): String = when (status) {
-            0xA0 -> "0xA0, неизвестная команда"
-            0xA1 -> "0xA1, неверный формат команды"
-            0xA2 -> "0xA2, уведомления уже нет"
-            0xA3 -> "0xA3, действие не выполнено"
-            else -> "ошибка $status"
+            0xA0 -> t("0xA0, unknown command", "0xA0, неизвестная команда")
+            0xA1 -> t("0xA1, invalid command format", "0xA1, неверный формат команды")
+            0xA2 -> t("0xA2, notification no longer exists", "0xA2, уведомления уже нет")
+            0xA3 -> t("0xA3, action failed", "0xA3, действие не выполнено")
+            else -> t("error $status", "ошибка $status")
         }
     }
 }

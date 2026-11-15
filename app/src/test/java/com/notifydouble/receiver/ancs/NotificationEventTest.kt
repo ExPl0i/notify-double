@@ -1,13 +1,23 @@
 package com.notifydouble.receiver.ancs
 
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import java.util.Locale
 
 /** The first two packets are copied from the nRF Connect log of stage 0B. */
 class NotificationEventTest {
+    private val originalLocale = Locale.getDefault()
+
+    @Before
+    fun useRussian() = Locale.setDefault(Locale.forLanguageTag("ru"))
+
+    @After
+    fun restoreLocale() = Locale.setDefault(originalLocale)
 
     @Test
     fun parsesNewSocialEventFromDevice() {
@@ -71,6 +81,18 @@ class NotificationEventTest {
         assertEquals(
             "добавлено · соцсети и сообщения · №3 · в категории 3 · " +
                 "существовало до подключения, есть отрицательное действие",
+            event.describe(),
+        )
+    }
+
+    @Test
+    fun describesEventInEnglish() {
+        Locale.setDefault(Locale.ENGLISH)
+        val event = NotificationEvent.parse(bytes(0x00, 0x14, 0x04, 0x03, 0x03, 0x00, 0x00, 0x00))!!
+
+        assertEquals(
+            "added · social and messages · №3 · in category 3 · " +
+                "existed before connection, has negative action",
             event.describe(),
         )
     }

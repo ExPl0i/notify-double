@@ -1,12 +1,24 @@
 package com.notifydouble.receiver.ancs
 
+import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayOutputStream
+import java.util.Locale
 
 class AncsClientTest {
+    private val originalLocale = Locale.getDefault()
+
+    // Some assertions read Russian log lines.
+    @Before
+    fun useRussian() = Locale.setDefault(Locale.forLanguageTag("ru"))
+
+    @After
+    fun restoreLocale() = Locale.setDefault(originalLocale)
+
     private val sent = mutableListOf<ByteArray>()
     private val logs = mutableListOf<String>()
     private val received = mutableListOf<Pair<AncsRequest, Map<Int, String>>>()

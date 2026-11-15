@@ -1,6 +1,7 @@
 package com.notifydouble.receiver
 
 import android.annotation.SuppressLint
+import com.notifydouble.receiver.i18n.Lang.t
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.ActivityNotFoundException
@@ -19,6 +20,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.mutableIntStateOf
 import com.notifydouble.receiver.forward.PrefsAppRegistry
+import com.notifydouble.receiver.i18n.Lang
 import com.notifydouble.receiver.ui.AppEntry
 import com.notifydouble.receiver.ui.BondedDevice
 import com.notifydouble.receiver.ui.MainScreen
@@ -63,20 +65,20 @@ class MainActivity : ComponentActivity(), ReceiverActions {
     @SuppressLint("MissingPermission")
     override fun bondedDevices(): List<BondedDevice>? {
         if (!Permissions.bluetoothGranted(this)) {
-            toast("Нужно разрешение на устройства поблизости")
+            toast(getString(R.string.need_permission))
             requestMissingPermissions()
             return null
         }
         val adapter = getSystemService(BluetoothManager::class.java)?.adapter
         if (adapter == null || !adapter.isEnabled) {
-            toast("Включите Bluetooth")
+            toast(getString(R.string.turn_on_bluetooth))
             return null
         }
         val devices = adapter.bondedDevices.orEmpty().map {
             BondedDevice(it.address, it.name, typeLabel(it.type))
         }
         if (devices.isEmpty()) {
-            toast("Нет сопряжённых устройств: сначала выполните сопряжение через nRF Connect")
+            toast(getString(R.string.no_bonded))
             return null
         }
         return devices
@@ -84,7 +86,7 @@ class MainActivity : ComponentActivity(), ReceiverActions {
 
     override fun selectDevice(device: BondedDevice) {
         AppSettings.setDevice(this, device.address, device.name)
-        EventLog.add("Выбрано устройство ${device.address}")
+        EventLog.add(t("Selected device ${device.address}", "Выбрано устройство ${device.address}"))
         if (AppSettings.enabled(this)) {
             // Restart so the service connects to the new device.
             stopService(Intent(this, ReceiverService::class.java))
@@ -94,12 +96,12 @@ class MainActivity : ComponentActivity(), ReceiverActions {
 
     override fun start() {
         if (!Permissions.bluetoothGranted(this)) {
-            toast("Нужно разрешение на устройства поблизости")
+            toast(getString(R.string.need_permission))
             requestMissingPermissions()
             return
         }
         if (AppSettings.address(this) == null) {
-            toast("Сначала выберите iPhone")
+            toast(getString(R.string.choose_iphone_first))
             return
         }
         AppSettings.setEnabled(this, true)
@@ -114,7 +116,7 @@ class MainActivity : ComponentActivity(), ReceiverActions {
     @SuppressLint("BatteryLife")
     override fun requestBatteryExemption() {
         if (batteryExempt()) {
-            toast("Оптимизация уже отключена")
+            toast(getString(R.string.battery_already_off))
             return
         }
         startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName")))
@@ -122,21 +124,24 @@ class MainActivity : ComponentActivity(), ReceiverActions {
 
     override fun openMiFitness() {
         val intent = packageManager.getLaunchIntentForPackage(MI_FITNESS_PACKAGE)
-        if (intent == null) toast("Mi Fitness не установлен") else startActivity(intent)
+        if (intent == null) toast(getString(R.string.mi_fitness_missing)) else startActivity(intent)
     }
+
+    private val guideUrl: String
+        get() = if (Lang.russian) GUIDE_URL_RU else GUIDE_URL_EN
 
     override fun openGuide() {
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(GUIDE_URL)))
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(guideUrl)))
         } catch (e: ActivityNotFoundException) {
-            toast("Нет браузера: $GUIDE_URL")
+            toast(getString(R.string.no_browser, guideUrl))
         }
     }
 
     override fun copyLog() {
         val text = EventLog.lines(COPY_LINES).joinToString("\n")
-        getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Журнал приёмника", text))
-        toast("Журнал скопирован")
+        getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText(getString(R.string.log_clip_label), text))
+        toast(getString(R.string.log_copied))
     }
 
     override fun clearLog() = EventLog.clear()
@@ -148,23 +153,26 @@ class MainActivity : ComponentActivity(), ReceiverActions {
 
     override fun setAllowed(appId: String, allowed: Boolean) {
         registry.setAllowed(appId, allowed)
-        EventLog.add(if (allowed) "Разрешено: $appId" else "Запрещено: $appId")
+        EventLog.add(if (allowed) t("Allowed: $appId", "Разрешено: $appId") else t("Disallowed: $appId", "Запрещено: $appId"))
     }
 
     override fun observeApps(onChange: () -> Unit): () -> Unit = registry.observe(onChange)
 
-    private fun typeLabel(type: Int) = when (type) {
-        BluetoothDevice.DEVICE_TYPE_LE -> "LE"
-        BluetoothDevice.DEVICE_TYPE_CLASSIC -> "классический"
-        BluetoothDevice.DEVICE_TYPE_DUAL -> "двухрежимный"
-        else -> "тип неизвестен"
-    }
+    private fun typeLabel(type: Int) = getString(
+        when (type) {
+            BluetoothDevice.DEVICE_TYPE_LE -> R.string.type_le
+            BluetoothDevice.DEVICE_TYPE_CLASSIC -> R.string.type_classic
+            BluetoothDevice.DEVICE_TYPE_DUAL -> R.string.type_dual
+            else -> R.string.type_unknown
+        },
+    )
 
     private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
     private companion object {
         const val MI_FITNESS_PACKAGE = "com.xiaomi.wearable"
-        const val GUIDE_URL = "https://github.com/Expl0iD-Dev-Team/notify-double#настройка"
+        const val GUIDE_URL_EN = "https://github.com/Expl0iD-Dev-Team/notify-double#setup"
+        const val GUIDE_URL_RU = "https://github.com/Expl0iD-Dev-Team/notify-double/blob/main/README.ru.md#настройка"
         const val COPY_LINES = 2_000
     }
 }

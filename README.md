@@ -1,133 +1,133 @@
 # Notify Double
 
-**Уведомления iPhone на браслете Xiaomi Smart Band через Android-телефон.**
+**English** · [Русский](README.ru.md)
 
-*English: an Android app that receives iPhone notifications over Apple's ANCS (Bluetooth LE) and republishes them on the Android phone, so Mi Fitness forwards them to a Xiaomi Smart Band that stays paired with the Android phone. No app on the iPhone, no jailbreak, no changes to Mi Fitness or the band. The UI and the setup guide below are in Russian.*
+**iPhone notifications on a Xiaomi Smart Band through an Android phone.**
 
----
-
-Браслет остаётся подключён к Android-телефону через Mi Fitness, как обычно. Приёмник читает уведомления iPhone по Bluetooth через штатную службу Apple Notification Center Service (ANCS) и публикует их на Android-телефоне. Mi Fitness забирает их оттуда, как уведомления любого другого приложения, и отправляет на браслет.
+The band stays paired with the Android phone through Mi Fitness, as usual. The receiver app reads iPhone notifications over Bluetooth through Apple's built-in Apple Notification Center Service (ANCS) and republishes them on the Android phone. Mi Fitness picks them up like notifications from any other app and sends them to the band.
 
 ```
-iPhone ──ANCS, Bluetooth LE──▶ Приёмник на Android ──уведомление──▶ Mi Fitness ──▶ браслет
+iPhone ──ANCS, Bluetooth LE──▶ Receiver on Android ──notification──▶ Mi Fitness ──▶ band
 ```
 
-## Возможности
+No app on the iPhone, no jailbreak, no changes to Mi Fitness or the band.
 
-- **Без приложения на iPhone.** iPhone нужен только один раз, для сопряжения через бесплатное приложение LightBlue.
-- **Разрешённый список.** Заголовок и текст запрашиваются только у отмеченных приложений iPhone. Для остальных приёмник узнаёт лишь, какое приложение прислало уведомление. По умолчанию список пуст, поэтому коды из банков и SMS на Android не попадают.
-- **Тихо на Android.** Уведомления публикуются на канале без звука и значка, Mi Fitness при этом пересылает их на браслет.
-- **Синхронизация.** Прочитанное или закрытое на iPhone уведомление исчезает и с браслета.
-- **Восстановление связи.** После выхода из зоны действия, выключения Bluetooth и перезагрузки приёмник подключается сам. Сообщения, пришедшие во время разрыва, доставляются после переподключения.
-- **Экономно.** Без постоянного опроса и блокировок пробуждения: всё происходит в обратных вызовах Bluetooth. За неделю использования разницы в расходе батареи замечено не было.
-- **Журнал.** Подключения, коды разрывов и события без текста уведомлений.
+## Features
 
-## Требования
+- **No iPhone app.** The iPhone is needed only once, for pairing with the free LightBlue app.
+- **Allowlist.** Titles and text are requested only for the iPhone apps you turn on. For other apps the receiver learns only which app sent a notification. The list starts empty, so bank and SMS codes never reach the Android phone.
+- **Silent on Android.** Notifications are posted on a channel with no sound and no status bar icon, and Mi Fitness still forwards them to the band.
+- **Kept in sync.** A notification read or dismissed on the iPhone disappears from the band too.
+- **Reconnects by itself.** After leaving Bluetooth range, turning Bluetooth off or a reboot, the receiver reconnects on its own. Messages that arrive while disconnected are delivered after reconnection.
+- **Battery friendly.** No polling and no wake locks: everything happens in Bluetooth callbacks. A week of daily use showed no noticeable difference in battery drain.
+- **Log.** Connections, disconnect codes and events, never notification text.
+- **English and Russian.** The UI and the log follow the phone's language.
+
+## Requirements
 
 | | |
 |---|---|
-| Android-телефон | Android 12 или новее, Bluetooth LE, Google Play для шрифта интерфейса (без него будет системный шрифт) |
-| Браслет | Подключён к этому телефону через Mi Fitness |
-| iPhone | Рядом с Android-телефоном, в пределах действия Bluetooth (около 10 м) |
-| Для настройки | Бесплатные приложения [LightBlue](https://apps.apple.com/app/id557428110) на iPhone и [nRF Connect for Mobile](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp) на Android |
+| Android phone | Android 12 or later with Bluetooth LE; Google Play services for the UI font (otherwise the system font is used) |
+| Band | Paired with this phone through Mi Fitness |
+| iPhone | Near the Android phone, within Bluetooth range (about 10 m) |
+| For setup | The free apps [LightBlue](https://apps.apple.com/app/id557428110) on the iPhone and [nRF Connect for Mobile](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp) on Android |
 
-Проверено: Nothing Phone 1 (Android 15), Mi Fitness 3.59.2i, Xiaomi Smart Band 10, Telegram и звонки на iPhone. С другими телефонами и браслетами должно работать по той же схеме, но не проверялось. Для проверки своей связки «Mi Fitness + браслет» есть приложение-проба в [`tools/mifitness-probe`](tools/mifitness-probe).
+Tested with Nothing Phone 1 (Android 15), Mi Fitness 3.59.2i, Xiaomi Smart Band 10, and Telegram and phone calls on the iPhone. Other phones and bands should work the same way but have not been tested. To check your own "Mi Fitness + band" combination, use the probe app in [`tools/mifitness-probe`](tools/mifitness-probe) (Russian UI).
 
-## Установка
+## Installation
 
-**Через Android Studio (рекомендуется).**
+**Ready-made APK (recommended).** Download `notify-double-<version>.apk` from [Releases](../../releases/latest) and install it, allowing installs from that source. Releases are signed with one key, so new versions install over old ones and keep your settings.
 
-1. Клонировать репозиторий и открыть его корень в Android Studio.
-2. Подключить телефон с включённой отладкой по USB и нажать **Run**.
+**From source.** Clone the repository, open its root in Android Studio, connect the phone with USB debugging on and press **Run**. That build is signed with your debug key: to switch between it and a release build, uninstall the app first.
 
-**Готовый APK.** Каждая сборка в [GitHub Actions](../../actions) прикладывает отладочный APK (артефакт `notify-double-debug-apk`). Он подписан временным ключом сборки, поэтому следующую версию из Actions придётся ставить после удаления предыдущей; настройки при этом сбросятся.
+## Setup
 
-## Настройка
+### 1. Pair the iPhone with Android (once)
 
-### 1. Сопряжение iPhone и Android (один раз)
+Pair **from nRF Connect**, not from the Bluetooth settings: a regular pairing may go over classic Bluetooth, while ANCS works only over Bluetooth LE.
 
-Сопряжение нужно выполнить **из nRF Connect**, а не из настроек Bluetooth: обычное сопряжение может пройти по классическому Bluetooth, а ANCS работает только через Bluetooth LE.
+1. **iPhone.** Open LightBlue → **Virtual Devices** tab → **+** → any template (for example, Blank) → save. A blue check mark appears next to the device. Keep LightBlue on screen and the iPhone unlocked.
+2. **Android.** Open nRF Connect → **Scanner** tab.
+   - Tap the filter bar and remove **Apple** from the excluded vendors: nRF Connect hides Apple devices by default.
+   - Find the device with the template's name (for example, **Blank**) and a strong signal (about −30 to −60 dBm). Do not search by MAC address: the iPhone uses a random one.
+3. Tap **Connect**. **Apple Notification Center Service** should be in the list of services.
+4. Menu **⋮** → **Bond**. Confirm the pairing on both phones and compare the code. The status changes to **BONDED**.
+5. Tap **Disconnect** in nRF Connect. You can close LightBlue on the iPhone: it is no longer needed.
 
-1. **iPhone.** Откройте LightBlue → вкладка **Virtual Devices** → **+** → любой шаблон (например, Blank) → сохраните. Рядом с устройством должна появиться синяя галочка. Оставьте LightBlue на экране, iPhone не блокируйте.
-2. **Android.** Откройте nRF Connect → вкладка **Scanner**.
-   - Нажмите на строку фильтра и уберите **Apple** из исключений: по умолчанию nRF Connect скрывает устройства Apple.
-   - Найдите устройство с именем шаблона (например, **Blank**) и сильным сигналом (около −30…−60 dBm). По MAC-адресу искать бесполезно: iPhone использует случайный адрес.
-3. Нажмите **Connect**. В списке служб должна быть **Apple Notification Center Service**.
-4. Меню **⋮** → **Bond**. Подтвердите сопряжение на обоих телефонах и сверьте код. Статус должен смениться на **BONDED**.
-5. В nRF Connect нажмите **Disconnect**. LightBlue на iPhone можно закрыть: он больше не нужен.
+A detailed guide with decoding of ANCS events and a manual check is in [docs/ancs-check-nrf-connect.md](docs/ancs-check-nrf-connect.md) (Russian).
 
-Подробнее, с расшифровкой событий ANCS и ручной проверкой, – в [docs/ancs-check-nrf-connect.md](docs/ancs-check-nrf-connect.md).
+### 2. Receiver
 
-### 2. Приёмник
-
-1. Откройте «Приёмник iPhone» и разрешите доступ к устройствам поблизости и уведомлениям.
-2. **iPhone** → выберите сопряжённое устройство (имя iPhone или имя шаблона LightBlue).
-3. **Батарея** → разрешите работу без ограничений, иначе система может остановить службу.
-4. **Запуск**. Через несколько секунд карточка состояния станет зелёной: «Подключено».
+1. Open **iPhone Receiver** and allow access to nearby devices and notifications.
+2. **iPhone** → choose the paired device (the iPhone's name or the LightBlue template's name).
+3. **Battery** → allow unrestricted use, otherwise the system may stop the service.
+4. **Start**. Within a few seconds the status card turns green: **Connected**.
 
 ### 3. Mi Fitness
 
-«Устройство» → «Уведомления и звонки» → «Уведомления приложений» → включите **«Приёмник iPhone»**. Кнопка **Mi Fitness** на главном экране приёмника открывает приложение.
+Device → Notifications and calls → App notifications → turn on **iPhone Receiver**. The **Mi Fitness** button on the receiver's home screen opens the app.
 
-### 4. Приложения iPhone
+### 4. iPhone apps
 
-Пришлите на iPhone сообщения из нужных приложений: они появятся на вкладке **Приложения**. Включите переключатель у тех, что нужно пересылать. Следующие уведомления этих приложений придут на браслет в виде «Telegram: Иван».
+Send yourself messages from the apps you need on the iPhone: they appear on the **Apps** tab. Turn on the switch for the apps to forward. Their next notifications arrive on the band as "Telegram: John".
 
-Не включайте банки, аутентификаторы и «Сообщения» (`com.apple.MobileSMS`): через них приходят коды подтверждения.
+Do not turn on banks, authenticators or Messages (`com.apple.MobileSMS`): they carry verification codes.
 
-## Решение проблем
+## Troubleshooting
 
-| Симптом | Что сделать |
+| Symptom | What to do |
 |---|---|
-| Карточка «Ожидание iPhone» долго не меняется | iPhone должен быть рядом и с включённым Bluetooth. Приёмник сам обновляет заявку на подключение раз в 10 минут; если не помогло – «Стоп» и «Запуск» |
-| В журнале «Служба ANCS не найдена» или ошибки подписки | iPhone: «Настройки» → Bluetooth → **i** рядом с устройством → включите переключатель системных уведомлений |
-| Уведомления приходят в приёмник, но не на браслет | Проверьте, что «Приёмник iPhone» включён в Mi Fitness, а у Mi Fitness разрешены автозапуск и работа в фоне |
-| В журнале «Пропущено: … не в списке» | Приложение не отмечено на вкладке «Приложения» |
-| Служба останавливается | Отключите оптимизацию батареи для приёмника |
-| Нужно пересопрячь | Удалите сопряжение на обоих телефонах и повторите шаг 1 |
+| The card shows "Waiting for iPhone" for a long time | Keep the iPhone nearby with Bluetooth on. The receiver renews its connection request every 10 minutes; if that does not help, press Stop and Start |
+| The log says "ANCS service not found" or shows subscription errors | iPhone: Settings → Bluetooth → **i** next to the device → turn on the system notifications switch |
+| Notifications reach the receiver but not the band | Check that iPhone Receiver is on in Mi Fitness and that Mi Fitness may autostart and run in the background |
+| The log says "Skipped: … is not allowed" | The app is not turned on in the Apps tab |
+| The service stops | Turn off battery optimization for the receiver |
+| You need to pair again | Remove the pairing on both phones and repeat step 1 |
 
-Журнал на вкладке **Журнал** показывает подключения и коды разрывов: 8 – потеря связи, 19 – соединение закрыл iPhone, 147 – тайм-аут подключения.
+The **Log** tab shows connections and disconnect codes: 8 – link lost, 19 – closed by the iPhone, 147 – connection timeout.
 
-## Ограничения
+## Limitations
 
-- Ответить на сообщение или отклонить вызов с браслета нельзя: браслет не знает о приёмнике, а ANCS не поддерживает текстовые ответы.
-- Входящий вызов приходит на браслет как обычное уведомление, без экрана вызова.
-- Значок уведомлений на браслете выбирает Mi Fitness или сам браслет.
-- Без связи с iPhone уведомления не пересылаются. Сообщения, пришедшие во время разрыва, приходят после переподключения, если они ещё не прочитаны на iPhone.
+- You cannot reply to a message or decline a call from the band: the band does not know about the receiver, and ANCS has no text replies.
+- An incoming call reaches the band as a regular notification, without the call screen.
+- The notification icon on the band is chosen by Mi Fitness or the band itself.
+- Without a link to the iPhone nothing is forwarded. Messages that arrived while disconnected come through after reconnection if they are still unread on the iPhone.
 
-## Приватность
+## Privacy
 
-- Текст запрашивается у iPhone только для отмеченных приложений и нигде не сохраняется: он есть только в опубликованных уведомлениях, которые сами исчезают через 12 часов.
-- В журнал попадают события, номера, идентификаторы и названия приложений, но не текст.
-- Приёмник не использует сеть.
+- Text is requested from the iPhone only for allowed apps and is never stored: it exists only in the posted notifications, which expire after 12 hours.
+- The log holds events, numbers, app identifiers and names, but no text.
+- The receiver does not use the network.
 
-## Как это устроено
+## How it works
 
-| Файл | Назначение |
+| File | Purpose |
 |---|---|
-| [`ble/AncsLink.kt`](app/src/main/java/com/notifydouble/receiver/ble/AncsLink.kt) | Подключение к iPhone, подписка на ANCS, переподключение |
-| [`ble/GattQueue.kt`](app/src/main/java/com/notifydouble/receiver/ble/GattQueue.kt) | Очередь операций GATT: Android выполняет их по одной |
-| [`ancs/`](app/src/main/java/com/notifydouble/receiver/ancs) | Протокол ANCS: события, запросы, сборка ответов из фрагментов |
-| [`forward/Forwarder.kt`](app/src/main/java/com/notifydouble/receiver/forward/Forwarder.kt) | Правила пересылки и разрешённый список |
-| [`ReceiverService.kt`](app/src/main/java/com/notifydouble/receiver/ReceiverService.kt) | Приоритетная служба, автозапуск, сторожевой таймер переподключения |
-| [`ui/`](app/src/main/java/com/notifydouble/receiver/ui) | Интерфейс на Jetpack Compose |
+| [`ble/AncsLink.kt`](app/src/main/java/com/notifydouble/receiver/ble/AncsLink.kt) | Connecting to the iPhone, ANCS subscription, reconnection |
+| [`ble/GattQueue.kt`](app/src/main/java/com/notifydouble/receiver/ble/GattQueue.kt) | GATT operation queue: Android runs them one at a time |
+| [`ancs/`](app/src/main/java/com/notifydouble/receiver/ancs) | ANCS protocol: events, requests, assembling fragmented responses |
+| [`forward/Forwarder.kt`](app/src/main/java/com/notifydouble/receiver/forward/Forwarder.kt) | Forwarding rules and the allowlist |
+| [`ReceiverService.kt`](app/src/main/java/com/notifydouble/receiver/ReceiverService.kt) | Foreground service, autostart, reconnection watchdog |
+| [`ui/`](app/src/main/java/com/notifydouble/receiver/ui) | Jetpack Compose UI |
 
-Ключевые решения:
+Key decisions:
 
-- Android подключается к iPhone как центральное устройство и сам запускает сопряжение; iPhone без подписки на ANCS закрывает соединение примерно через 30 секунд, поэтому подписка оформляется сразу после поиска служб.
-- Запросы к Control Point идут строго по одному; ответ Data Source собирается из фрагментов и считается полным, когда получены все запрошенные атрибуты.
-- Уведомления, существовавшие до подключения, не пересылаются; пришедшие во время разрыва iPhone отдаёт как новые.
+- Android connects to the iPhone as the central and starts pairing itself. Without an ANCS subscription the iPhone closes the link after about 30 seconds, so the receiver subscribes right after service discovery.
+- Control Point requests go strictly one at a time. A Data Source response is assembled from fragments and is complete once every requested attribute has arrived.
+- Notifications that existed before the connection are not forwarded; the iPhone reports the ones that arrived during a disconnect as new.
 
-История исследования, проверки на устройствах и все решения – в [docs/research-plan.md](docs/research-plan.md).
+The research history, on-device checks and all decisions are in [docs/research-plan.md](docs/research-plan.md) (Russian).
 
-**Тесты.** Модульные тесты разбора ANCS, очереди запросов и правил пересылки запускаются без телефона: в Android Studio правой кнопкой на `app/src/test` → Run, или `gradle testDebugUnitTest`.
+**Tests.** Unit tests for ANCS parsing, the request queue and the forwarding rules run without a phone: in Android Studio right-click `app/src/test` → Run, or `gradle testDebugUnitTest`.
 
-## Благодарности
+**Releases.** A tag such as `v1.2.0` builds a signed APK and creates a release (`.github/workflows/release.yml`). The signing key is kept in the repository secrets.
 
-- Дизайн интерфейса и компоненты основаны на [leager-app](https://github.com/Expl0iD-Dev-Team/leager-app).
-- [Спецификация ANCS](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html) от Apple.
-- Проекты [WearBridge](https://github.com/k97/WearBridge), [ancs4linux](https://github.com/pzmarzly/ancs4linux) и [ancs-client](https://codeberg.org/chf/ancs-client) помогли выбрать схему подключения.
+## Credits
 
-## Лицензия
+- The UI design and components are based on [leager-app](https://github.com/Expl0iD-Dev-Team/leager-app).
+- Apple's [ANCS specification](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html).
+- [WearBridge](https://github.com/k97/WearBridge), [ancs4linux](https://github.com/pzmarzly/ancs4linux) and [ancs-client](https://codeberg.org/chf/ancs-client) helped choose the connection scheme.
 
-[MIT](LICENSE). Проект не связан с Apple, Xiaomi или Nothing. iPhone и Apple – товарные знаки Apple Inc.
+## License
+
+[MIT](LICENSE). Not affiliated with Apple, Xiaomi or Nothing. iPhone and Apple are trademarks of Apple Inc.

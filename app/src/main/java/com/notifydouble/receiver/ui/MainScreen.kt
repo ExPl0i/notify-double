@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.notifydouble.receiver.EventLog
 import com.notifydouble.receiver.ReceiverState
+import com.notifydouble.receiver.R
 import com.notifydouble.receiver.ReceiverStatus
 import com.notifydouble.receiver.ble.AncsLink
 import com.notifydouble.receiver.ui.theme.receiver
@@ -71,11 +73,6 @@ data class BondedDevice(val address: String, val name: String?, val type: String
 
 data class AppEntry(val appId: String, val name: String?, val allowed: Boolean)
 
-private val tabs = listOf(
-    BarItem("Главная", AppIcons.Home),
-    BarItem("Приложения", AppIcons.Grid),
-    BarItem("Журнал", AppIcons.List),
-)
 
 /** [refreshKey] changes when the activity resumes, so settings changed elsewhere are re-read. */
 @Composable
@@ -84,6 +81,11 @@ fun MainScreen(actions: ReceiverActions, refreshKey: Int) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var revision by remember { mutableIntStateOf(0) }
     val refresh = refreshKey + revision
+    val tabs = listOf(
+        BarItem(stringResource(R.string.tab_home), AppIcons.Home),
+        BarItem(stringResource(R.string.tab_apps), AppIcons.Grid),
+        BarItem(stringResource(R.string.tab_log), AppIcons.List),
+    )
 
     Box(
         modifier = Modifier
@@ -135,8 +137,8 @@ private fun HomeTab(actions: ReceiverActions, refresh: Int, onChanged: () -> Uni
         IconBubble(AppIcons.Bell, color = c.text, size = 48.dp, corner = 24.dp, background = c.surface2)
         Spacer(Modifier.width(14.dp))
         Column {
-            Text("iPhone → Mi Fitness → браслет", style = MaterialTheme.typography.bodySmall, color = c.muted)
-            Text("Приёмник iPhone", style = MaterialTheme.typography.titleLarge, color = c.text)
+            Text(stringResource(R.string.home_route), style = MaterialTheme.typography.bodySmall, color = c.muted)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge, color = c.text)
         }
     }
 
@@ -144,45 +146,45 @@ private fun HomeTab(actions: ReceiverActions, refresh: Int, onChanged: () -> Uni
 
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         if (enabled) {
-            ActionTile(AppIcons.Stop, "Стоп", Modifier.weight(1f)) {
+            ActionTile(AppIcons.Stop, stringResource(R.string.action_stop), Modifier.weight(1f)) {
                 actions.stop()
                 onChanged()
             }
         } else {
-            ActionTile(AppIcons.Play, "Запуск", Modifier.weight(1f)) {
+            ActionTile(AppIcons.Play, stringResource(R.string.action_start), Modifier.weight(1f)) {
                 actions.start()
                 onChanged()
             }
         }
-        ActionTile(AppIcons.Smartphone, "iPhone", Modifier.weight(1f)) { chooser = actions.bondedDevices() }
-        ActionTile(AppIcons.Battery, "Батарея", Modifier.weight(1f)) { actions.requestBatteryExemption() }
-        ActionTile(AppIcons.Watch, "Mi Fitness", Modifier.weight(1f)) { actions.openMiFitness() }
+        ActionTile(AppIcons.Smartphone, stringResource(R.string.action_iphone), Modifier.weight(1f)) { chooser = actions.bondedDevices() }
+        ActionTile(AppIcons.Battery, stringResource(R.string.action_battery), Modifier.weight(1f)) { actions.requestBatteryExemption() }
+        ActionTile(AppIcons.Watch, stringResource(R.string.action_mi_fitness), Modifier.weight(1f)) { actions.openMiFitness() }
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        GroupLabel("Последнее событие")
+        GroupLabel(stringResource(R.string.last_event))
         SoftCard {
             Text(
-                status.lastEvent ?: "Пока событий нет",
+                status.lastEvent ?: stringResource(R.string.no_events),
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (status.lastEvent == null) c.muted else c.text,
             )
         }
     }
 
-    SettingsGroup("Настройка") {
+    SettingsGroup(stringResource(R.string.group_setup)) {
         SettingsItem(
-            title = "iPhone",
+            title = stringResource(R.string.setting_iphone),
             icon = AppIcons.Smartphone,
-            subtitle = deviceAddress ?: "Выберите из сопряжённых устройств",
-            value = deviceName ?: "не выбран",
+            subtitle = deviceAddress ?: stringResource(R.string.setting_iphone_hint),
+            value = deviceName ?: stringResource(R.string.setting_iphone_none),
             onClick = { chooser = actions.bondedDevices() },
         )
         SettingsItem(
-            title = "Оптимизация батареи",
+            title = stringResource(R.string.setting_battery),
             icon = AppIcons.Battery,
-            subtitle = "Нужно отключить, чтобы служба не останавливалась",
-            value = if (batteryExempt) "отключена" else "включена",
+            subtitle = stringResource(R.string.setting_battery_hint),
+            value = stringResource(if (batteryExempt) R.string.battery_off else R.string.battery_on),
             onClick = if (batteryExempt) null else actions::requestBatteryExemption,
             trailing = if (batteryExempt) {
                 { Icon(AppIcons.Check, contentDescription = null, tint = c.accent, modifier = Modifier.size(18.dp)) }
@@ -191,15 +193,15 @@ private fun HomeTab(actions: ReceiverActions, refresh: Int, onChanged: () -> Uni
             },
         )
         SettingsItem(
-            title = "Mi Fitness",
+            title = stringResource(R.string.setting_mi_fitness),
             icon = AppIcons.Watch,
-            subtitle = "Включите «Приёмник iPhone» в уведомлениях приложений",
+            subtitle = stringResource(R.string.setting_mi_fitness_hint),
             onClick = actions::openMiFitness,
         )
         SettingsItem(
-            title = "Как связать телефоны",
+            title = stringResource(R.string.setting_guide),
             icon = AppIcons.Info,
-            subtitle = "Пошаговая инструкция на GitHub",
+            subtitle = stringResource(R.string.setting_guide_hint),
             onClick = actions::openGuide,
         )
     }
@@ -217,14 +219,17 @@ private fun HomeTab(actions: ReceiverActions, refresh: Int, onChanged: () -> Uni
     }
 }
 
-private fun AncsLink.State.headline(): String = when (this) {
-    AncsLink.State.STOPPED -> "Остановлен"
-    AncsLink.State.BLUETOOTH_OFF -> "Bluetooth выключен"
-    AncsLink.State.CONNECTING, AncsLink.State.SUBSCRIBING -> "Подключение…"
-    AncsLink.State.WAITING -> "Ожидание iPhone"
-    AncsLink.State.PAIRING -> "Сопряжение"
-    AncsLink.State.SESSION -> "Подключено"
-}
+@Composable
+private fun headline(state: AncsLink.State): String = stringResource(
+    when (state) {
+        AncsLink.State.STOPPED -> R.string.headline_stopped
+        AncsLink.State.BLUETOOTH_OFF -> R.string.headline_bluetooth_off
+        AncsLink.State.CONNECTING, AncsLink.State.SUBSCRIBING -> R.string.headline_connecting
+        AncsLink.State.WAITING -> R.string.headline_waiting
+        AncsLink.State.PAIRING -> R.string.headline_pairing
+        AncsLink.State.SESSION -> R.string.headline_connected
+    },
+)
 
 /** The accent card from leager-app's home screen; it turns neutral while not connected. */
 @Composable
@@ -243,9 +248,9 @@ private fun StatusCard(status: ReceiverStatus, deviceName: String?) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Состояние", style = MaterialTheme.typography.titleMedium, color = fg, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.status_title), style = MaterialTheme.typography.titleMedium, color = fg, modifier = Modifier.weight(1f))
             Text(
-                deviceName ?: "iPhone не выбран",
+                deviceName ?: stringResource(R.string.no_iphone),
                 style = MaterialTheme.typography.labelMedium,
                 color = fg,
                 maxLines = 1,
@@ -256,10 +261,10 @@ private fun StatusCard(status: ReceiverStatus, deviceName: String?) {
                     .padding(horizontal = 12.dp, vertical = 7.dp),
             )
         }
-        Text(status.link.headline(), style = MaterialTheme.typography.displayMedium, color = fg)
+        Text(headline(status.link), style = MaterialTheme.typography.displayMedium, color = fg)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatPill(AppIcons.Bell, "Событий", status.events.toString(), fg, Modifier.weight(1f))
-            StatPill(AppIcons.Check, "Переслано", status.forwarded.toString(), fg, Modifier.weight(1f))
+            StatPill(AppIcons.Bell, stringResource(R.string.stat_events), status.events.toString(), fg, Modifier.weight(1f))
+            StatPill(AppIcons.Check, stringResource(R.string.stat_forwarded), status.forwarded.toString(), fg, Modifier.weight(1f))
         }
     }
 }
@@ -302,9 +307,9 @@ private fun DeviceChooser(devices: List<BondedDevice>, onSelect: (BondedDevice) 
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Text("Выберите iPhone", style = MaterialTheme.typography.titleLarge, color = c.text)
+            Text(stringResource(R.string.chooser_title), style = MaterialTheme.typography.titleLarge, color = c.text)
             Text(
-                "Показаны сопряжённые устройства. iPhone – это запись, сопряжённая через nRF Connect.",
+                stringResource(R.string.chooser_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = c.muted,
             )
@@ -315,14 +320,14 @@ private fun DeviceChooser(devices: List<BondedDevice>, onSelect: (BondedDevice) 
             ) {
                 devices.forEach { device ->
                     SettingsItem(
-                        title = device.name ?: "Без имени",
+                        title = device.name ?: stringResource(R.string.unnamed),
                         icon = AppIcons.Smartphone,
                         subtitle = "${device.address} · ${device.type}",
                         onClick = { onSelect(device) },
                     )
                 }
             }
-            DialogButton("Отмена", kind = ButtonKind.SECONDARY, onClick = onDismiss)
+            DialogButton(stringResource(R.string.cancel), kind = ButtonKind.SECONDARY, onClick = onDismiss)
         }
     }
 }
@@ -339,15 +344,14 @@ private fun AppsTab(actions: ReceiverActions) {
     }
     val apps = remember(revision) { actions.apps() }
 
-    ScreenTitle("Приложения")
+    ScreenTitle(stringResource(R.string.apps_title))
 
     SoftCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBubble(AppIcons.Shield, color = c.danger, size = 38.dp, corner = 12.dp)
             Spacer(Modifier.width(14.dp))
             Text(
-                "Текст запрашивается только у отмеченных приложений. Не отмечайте банки, " +
-                    "аутентификаторы и «Сообщения»: через них приходят коды.",
+                stringResource(R.string.apps_warning),
                 style = MaterialTheme.typography.bodySmall,
                 color = c.muted,
             )
@@ -356,15 +360,15 @@ private fun AppsTab(actions: ReceiverActions) {
 
     if (apps.isEmpty()) {
         SoftCard {
-            Text("Пока пусто", style = MaterialTheme.typography.titleMedium, color = c.text)
+            Text(stringResource(R.string.apps_empty_title), style = MaterialTheme.typography.titleMedium, color = c.text)
             Text(
-                "Приложения iPhone появятся здесь после первых уведомлений.",
+                stringResource(R.string.apps_empty_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = c.muted,
             )
         }
     } else {
-        SettingsGroup("С iPhone · ${apps.size}") {
+        SettingsGroup(stringResource(R.string.apps_group, apps.size)) {
             apps.forEach { app ->
                 SettingsItem(
                     title = app.name ?: app.appId,
@@ -386,20 +390,20 @@ private fun LogTab(actions: ReceiverActions) {
     val version by EventLog.version.collectAsState()
     val lines = remember(version) { EventLog.lines(LOG_LINES).asReversed() }
 
-    ScreenTitle("Журнал") {
+    ScreenTitle(stringResource(R.string.log_title)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            CircleIconButton(AppIcons.Copy, "Копировать журнал", actions::copyLog)
-            CircleIconButton(AppIcons.Trash, "Очистить журнал", actions::clearLog)
+            CircleIconButton(AppIcons.Copy, stringResource(R.string.log_copy), actions::copyLog)
+            CircleIconButton(AppIcons.Trash, stringResource(R.string.log_clear), actions::clearLog)
         }
     }
     Text(
-        "Новые записи сверху. Текст уведомлений в журнал не попадает.",
+        stringResource(R.string.log_hint),
         style = MaterialTheme.typography.bodySmall,
         color = c.muted,
     )
     SoftCard(contentPadding = PaddingValues(16.dp)) {
         if (lines.isEmpty()) {
-            Text("Журнал пуст", style = MaterialTheme.typography.bodyMedium, color = c.muted)
+            Text(stringResource(R.string.log_empty), style = MaterialTheme.typography.bodyMedium, color = c.muted)
         }
         lines.forEach { line ->
             Text(

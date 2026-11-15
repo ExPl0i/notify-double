@@ -23,8 +23,8 @@ class ReceiverApp : Application() {
         EventLog.init(this)
         // MIN: no sound, no status bar icon, and Mi Fitness still forwards it (stage 0A).
         val channels = listOf(
-            NotificationChannel(SERVICE_CHANNEL, "Служба приёмника", NotificationManager.IMPORTANCE_MIN),
-            NotificationChannel(IPHONE_CHANNEL, "Уведомления iPhone", NotificationManager.IMPORTANCE_MIN),
+            NotificationChannel(SERVICE_CHANNEL, getString(R.string.channel_service), NotificationManager.IMPORTANCE_MIN),
+            NotificationChannel(IPHONE_CHANNEL, getString(R.string.channel_iphone), NotificationManager.IMPORTANCE_MIN),
         ).onEach {
             it.setSound(null, null)
             it.enableVibration(false)

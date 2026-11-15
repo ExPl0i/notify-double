@@ -1,6 +1,7 @@
 package com.notifydouble.receiver.ble
 
 import android.bluetooth.BluetoothGatt
+import com.notifydouble.receiver.i18n.Lang.t
 import android.os.Handler
 
 /**
@@ -20,7 +21,7 @@ class GattQueue(
     private var gatt: BluetoothGatt? = null
 
     private val timeout = Runnable {
-        log("Операция «${current?.name}» не завершилась за ${TIMEOUT_MS / 1000} с")
+        log(t("Operation “${current?.name}” did not finish in ${TIMEOUT_MS / 1000} s", "Операция «${current?.name}» не завершилась за ${TIMEOUT_MS / 1000} с"))
         current = null
         next()
     }
@@ -39,7 +40,7 @@ class GattQueue(
     fun enqueue(kind: Kind, name: String, start: (BluetoothGatt) -> Boolean) {
         // Without a link the operation would wait and run on the next connection by mistake.
         if (gatt == null) {
-            log("Нет соединения, операция «$name» пропущена")
+            log(t("No connection, operation “$name” skipped", "Нет соединения, операция «$name» пропущена"))
             return
         }
         pending.addLast(Op(kind, name, start))
@@ -65,7 +66,7 @@ class GattQueue(
                 current = op
                 handler.postDelayed(timeout, TIMEOUT_MS)
             } else {
-                log("Не удалось начать операцию «${op.name}»")
+                log(t("Could not start operation “${op.name}”", "Не удалось начать операцию «${op.name}»"))
             }
         }
     }

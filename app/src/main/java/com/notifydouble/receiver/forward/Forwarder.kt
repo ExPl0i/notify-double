@@ -1,6 +1,7 @@
 package com.notifydouble.receiver.forward
 
 import com.notifydouble.receiver.ancs.AncsClient
+import com.notifydouble.receiver.i18n.Lang.t
 import com.notifydouble.receiver.ancs.AncsRequester
 import com.notifydouble.receiver.ancs.AppRequest
 import com.notifydouble.receiver.ancs.AttributeId
@@ -95,7 +96,7 @@ class Forwarder(
 
     private fun requestContent(uid: Long, appId: String) {
         if (!apps.isAllowed(appId)) {
-            log("Пропущено: $appId не в списке, №$uid")
+            log(t("Skipped: $appId is not allowed, №$uid", "Пропущено: $appId не в списке, №$uid"))
             return
         }
         requester.enqueue(
@@ -115,7 +116,7 @@ class Forwarder(
         appIds.remove(uid)
         posted.remove(uid)?.let {
             poster.cancel(it.id)
-            log("Снято: №$uid")
+            log(t("Removed: №$uid", "Снято: №$uid"))
         }
     }
 
@@ -125,13 +126,13 @@ class Forwarder(
         val previous = posted[uid]
         // The band signals on every update, so republish only when something visible changed.
         if (previous != null && previous.title == shownTitle && previous.text == message) {
-            log("Без изменений: №$uid")
+            log(t("Unchanged: №$uid", "Без изменений: №$uid"))
             return
         }
         val id = previous?.id ?: poster.nextId()
         poster.show(id, shownTitle, message)
         posted[uid] = Posted(id, shownTitle, message)
-        log("Переслано: $name, №$uid")
+        log(t("Forwarded: $name, №$uid", "Переслано: $name, №$uid"))
     }
 
     companion object {
